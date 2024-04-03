@@ -72,5 +72,37 @@ module.exports = {
         } catch(err) {
             res.status(500).json(err);
         }
-    }
+    },
+
+    // create a reaction
+    async addReaction(req, res) {
+        try {
+            const thought = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $push: { reactions: req.body }},
+                { runValidators: true, new: true }
+                );
+
+            res.status(201).json(thought);
+        } catch(err) {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    // Delete reaction
+    async deleteReaction(req, res) {
+        try {
+            const thought = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $pull: { reactions: { reactionId: req.params.reactionId}}},
+                { runValidators: true, new: true }
+                );
+
+            res.status(201).json(thought);
+        } catch(err) {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
 }
