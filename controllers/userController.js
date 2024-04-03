@@ -15,7 +15,10 @@ module.exports = {
     // Get a User
     async getSingleUser(req, res) {
         try {
-            const user = await User.findOne({ _id: req.params.userId });
+            const user = await User.findOne({ _id: req.params.userId })
+            .populate('thoughts')
+            .populate('friends');
+
             if (!user) {
                 return res.status(404).json({ message: 'User not found' });
             }
@@ -65,5 +68,44 @@ module.exports = {
         } catch(err) {
             res.status(500).json(err);
         }
+    },
+
+    // add a new friend to friend list
+
+    async addFriend(req, res) {
+        try {
+            const newFriend = req.params.friendId;
+
+            await User.updateOne(
+                { _id: req.params.userId },
+                { $push: { friends: newFriend }}
+            );
+
+            res.status(201).json({ message: 'new friend added' });
+
+        } catch(err) {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    //
+    async removeFriend(req, res) {
+        try {
+            const oldFriend = req.params.friendId;
+
+            await User.updateOne(
+                { _id: req.params.userId },
+                { $pull: { friends: oldFriend }},
+                { new: true }
+            );
+
+            res.status(201).json({ message: 'user removed from friend list' });
+
+        } catch(err) {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
+        }
     }
+
 }
