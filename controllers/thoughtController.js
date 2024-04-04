@@ -15,9 +15,9 @@ module.exports = {
     // Get a Thought
     async getSingleThought(req, res) {
         try {
-            const thought = await User.findOne({ _id: req.params.thoughtId });
+            const thought = await Thought.findOne({ _id: req.params.thoughtId });
             if (!thought) {
-                return res.status(404).json({ message: 'User not found' });
+                return res.status(404).json({ message: 'Thought not found' });
             }
             res.status(200).json(thought);
         } catch (err) {
@@ -31,7 +31,7 @@ module.exports = {
             const newThought = await Thought.create(req.body);
 
             await User.updateOne(
-                { _id: req.body.userId },
+                { username: req.body.username },
                 { $push: { thoughts: newThought._id } } 
             );
 
@@ -47,10 +47,12 @@ module.exports = {
     async updateThought(req, res) {
         try {
             const thought = await Thought.findOneAndUpdate(
-                {_id: req.params.userId},
+                {_id: req.params.thoughtId},
                 { $set: req.body },
                 { runValidators: true, new: true }
             );
+
+            console.log(thought);
             res.json(thought);
         } catch(err) {
             console.error(err);
@@ -62,14 +64,15 @@ module.exports = {
 
     async deleteThought(req, res) {
         try {
-            const user = await Thought.findOneAndRemove({ _id: req.params.thoughtId })
+            const user = await Thought.findOneAndDelete({ _id: req.params.thoughtId })
 
             if (!user) {
-                return res.status(404).json({ message: 'No such User exists' });
+                return res.status(404).json({ message: 'No such Thought exists' });
             }
 
             res.json({ message: 'Thought successfully deleted' });
         } catch(err) {
+            console.log(err);
             res.status(500).json(err);
         }
     },
