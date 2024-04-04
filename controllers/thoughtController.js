@@ -26,7 +26,7 @@ module.exports = {
         }
     },
     // Create new Thought
-    async creatThought(req, res) {
+    async createThought(req, res) {
         try {
             const newThought = await Thought.create(req.body);
 
