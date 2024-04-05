@@ -1,5 +1,6 @@
 const { User, Thought } = require('../models');
-
+const mongoose = require('mongoose');
+const { ObjectId } = require('mongoose').Types;
 module.exports = {
 
     // Get Users
@@ -75,7 +76,7 @@ module.exports = {
 
     async addFriend(req, res) {
         try {
-            const newFriend = req.params.friendId;
+            const newFriend = new mongoose.Types.ObjectId(req.params.friendId);
 
             await User.updateOne(
                 { _id: req.params.userId },

@@ -93,19 +93,21 @@ module.exports = {
         }
     },
 
-    // Delete reaction
-    async deleteReaction(req, res) {
-        try {
-            const thought = await Thought.findOneAndUpdate(
-                { _id: req.params.thoughtId },
-                { $pull: { reactions: { reactionId: req.params.reactionId}}},
-                { runValidators: true, new: true }
-                );
+        // create a reaction
+        async deleteReaction(req, res) {
+            try {
+                const thought = await Thought.findOneAndUpdate(
+                    { _id: req.params.thoughtId },
+                    { $pull: { reactions: { reactionId: req.params.reactionId } } },
+                    { runValidators: true, new: true }
+                    );
+    
+                res.status(201).json({ message: 'reaction deleted' });
+            } catch(err) {
+                console.error(err);
+                res.status(500).json({ message: 'Internal server error' });
+            }
+        },
 
-            res.status(201).json(thought);
-        } catch(err) {
-            console.error(err);
-            res.status(500).json({ message: 'Internal server error' });
-        }
-    },
+
 }

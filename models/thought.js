@@ -1,11 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const { ObjectId } = require('mongoose').Types;
+
+const options = {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric', 
+};
 
 const reactionSchema = new Schema({
    reactionId: {
-    type: Schema.Types.ObjectId,
-    default: mongoose.Types.ObjectId
-    
+    type: mongoose.Types.ObjectId,
+    default: () => new mongoose.Types.ObjectId()
     },
     reactionBody: {
         type: String,
@@ -20,7 +27,9 @@ const reactionSchema = new Schema({
         type: Date,
         default: Date.now,
         get: function(date) {
-            return date.toLocaleString();
+            const formattedDate = date.toLocaleDateString(undefined, options);
+            const formattedTime = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            return `${formattedDate} ${formattedTime}`;
         }
     }
 });
@@ -37,7 +46,9 @@ const thoughtSchema = new Schema(
             type: Date,
             default: Date.now,
             get: function(date) {
-                return date.toLocaleString();
+                const formattedDate = date.toLocaleDateString(undefined, options);
+                const formattedTime = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                return `${formattedDate} ${formattedTime}`;
             }
         },
         username: {
@@ -45,8 +56,22 @@ const thoughtSchema = new Schema(
             required: true
         },
         reactions: [reactionSchema],
-    }
+    },
+    {
+        toJSON: {
+          virtuals: true,
+          getters: true, // Enable getters for JSON serialization
+            transform: function(doc, ret) {
+                return ret;
+            }
+        },
+        id: false,
+      }
 );
+
+thoughtSchema.virtual('reactionCount').get(function() {
+    return this.reactions.length;
+  });
 
 const Thought = model('Thought', thoughtSchema);
 
