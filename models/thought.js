@@ -32,7 +32,18 @@ const reactionSchema = new Schema({
             return `${formattedDate} ${formattedTime}`;
         }
     }
-});
+},
+{
+    toJSON: {
+      virtuals: true,
+      getters: true, 
+        transform: function(doc, ret) {
+            return ret;
+        }
+    },
+    id: false,
+  }
+);
 
 
 const thoughtSchema = new Schema(
@@ -60,7 +71,7 @@ const thoughtSchema = new Schema(
     {
         toJSON: {
           virtuals: true,
-          getters: true, // Enable getters for JSON serialization
+          getters: true,
             transform: function(doc, ret) {
                 return ret;
             }
